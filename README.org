@@ -1,0 +1,45 @@
+* Brainf*uck Interpreter/Compiler
+The [[https://en.wikipedia.org/wiki/Brainfuck][Brainf*ck]] programming language is very weird and impractical for production
+use. None of this stopped me from writing and Interpreter/Compiler for it
+though. Which you can use for all your +nonexistent+ Brainf*ck needs.
+
+You're Welcome.
+* Usage
+** Interactive 
+To use the interpreted mode on a .bf file. Just pass it with no arguments to the
+binary.
+#+begin_src sh
+bfic [FILE]...
+#+end_src
+*** REPL
+If you don't pass any files, the program will start a REPL. Which allows you to
+interactively run Brainf*uck code.
+#+begin_src sh
+bfic
+#+end_src
+** Complication
+You can also turn Brainf*ck code to a binary. Just pass =-c= before the files
+you want to compile.
+#+begin_src sh
+bfic -c [FILE]...
+#+end_src
+* Building
+Use the included Makefile.
+#+begin_src sh
+make -k
+#+end_src
+* Copyright/Licensing
+Copyright (C) 2024  Imran Mustafa
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
