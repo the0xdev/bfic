@@ -36,7 +36,41 @@ void reset_tape();
 
 int main(const int argc, char *const argv[]) {
   if (1 == argc) {
-    printf("Hopefully a future interactive mode will be here.");
+    FILE *const fptr = tmpfile();
+    if (NULL == fptr) {
+      perror("Could not open tmpfile");
+      exit(EXIT_FAILURE);
+    }
+
+    char input[256];
+    while (1) {
+      printf("\nCell number: %d\nCell content: %d\ninput: ", addr, mem[addr]);
+      scanf("%s", input);
+
+      fputs(input, fptr);
+      reset_tape();
+      fseek(fptr, 0, SEEK_SET);
+
+      char instruction = EOF;
+      while (EOF != (instruction = fgetc(fptr))) {
+        int code = exec(instruction);
+	
+        switch (code) {
+        case 1:
+          push(ftell(fptr));
+          break;
+        case 2:
+          fseek(fptr, top(), SEEK_SET);
+          break;
+        case 3:
+          pop();
+          break;
+        }
+      }
+    }
+
+    reset_tape();
+    fclose(fptr);
   } else if (strcmp(argv[1], "-c") == 0) {
     for (int ii = 2; ii <= argc; ii++) {
       printf("Hopefully a future release will add the complier.");
