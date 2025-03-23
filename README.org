@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2025 Imran M <imran@imranmustafa.net>
+# SPDX-License-Identifier: GPL-3.0-or-later
 * Brainf*uck Interpreter/Compiler
 The [[https://en.wikipedia.org/wiki/Brainfuck][Brainf*ck]] programming language is very weird and impractical for production
 use. None of this stopped me from writing and Interpreter/Compiler for it
@@ -24,12 +26,9 @@ you want to compile.
 bfic -c [FILE]...
 #+end_src
 * Building
-Use the included Makefile.
-#+begin_src sh
-make -k
-#+end_src
+This project uses cargo and nix so either =cargo build -r= or =nix build= will work
 * Copyright/Licensing
-Copyright (C) 2024  Imran Mustafa
+Copyright (C) 2024-2025  Imran M
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

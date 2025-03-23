@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 Imran M <imran@imranmustafa.net>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 {
   description = "Brainfuck interpreter and compilier";
   inputs = {
@@ -15,26 +19,23 @@
       in
         with pkgs; { 
           packages = {
-            default = stdenv.mkDerivation {
+            default = stdenv.mkDerivation rec {
               name = "bfic";
               src = ./.;
 
               buildInputs = [
-                gnumake
-                glibc
               ];
               nativeBuildInputs = [
-                gcc
+                cargo
               ];
 
               buildPhase = ''
-                make -k
+                cargo build -r
               '';
               installPhase = ''
                 mkdir -p $out/bin
-                cp bfic $out/bin
+                cp target/release/${name} $out/bin
               '';
-
             };
           };
         }
