@@ -51,7 +51,22 @@ fn interpreter(tokens: &str) {
 	    },
 
 	    '[' if tape[tape_ptr] == 0 => {
-		let _ = stream.position(|(_, t)| t == ']');
+		loop {
+		    let Some((_, token)) = stream.next() else {panic!()};
+		    let mut count: usize = 0;
+
+		    match token {
+			'[' => count += 1,
+			']' if count == 0 => {
+			    break;
+			},
+			']' if count < 0 => {
+			    panic!("");
+			},
+			']' => count -= 1,
+			_ => (),
+		    }
+		}
 	    }, // jumps
 	    '[' => {
 		stack.push(ii - 1);
