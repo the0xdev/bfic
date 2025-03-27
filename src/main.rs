@@ -8,12 +8,34 @@ use std::io::{
     stdout
 };
 
+use std::env;
+use std::fs;
+
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
+
 const TAPE_LEN: usize = 30_000;
 
 fn main() {
-    interpreter("++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.");
-}
+    let args: Vec<String> = env::args().collect();
 
+    if args.len() == 1 {
+	todo!("interactive mode")
+    }
+
+    let mode = &args[1];
+
+    match mode.as_str() {
+	"-c" => todo!("compile"), // compile
+	"-f" => todo!("file mode"), // interprate file
+	_ => {
+	    for s in args.iter().skip(1) {
+		interpreter(s);
+	    }
+	} // read string
+    }
+}
 
 fn interpreter(tokens: &str) {
     let mut tape: [u8; TAPE_LEN] = [0; TAPE_LEN];
