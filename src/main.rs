@@ -5,7 +5,9 @@
 use std::io::{
     Read,
     Write,
-    stdout
+    stdout,
+    stdin
+
 };
 
 use std::env;
@@ -21,7 +23,17 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
     if args.len() == 1 {
-	todo!("interactive mode")
+	loop {
+	    print!(">>> ");
+	    let _ = stdout().flush();
+	    let mut input = String::new();
+	    match stdin().read_line(&mut input) {
+		Ok(n) => {
+		    interpreter(&input);
+		}
+		Err(error) => println!("error: {error}"),
+	    }
+	}
     }
 
     let mode = &args[1];
