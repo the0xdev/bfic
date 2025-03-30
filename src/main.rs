@@ -28,10 +28,10 @@ fn main() {
 
     match mode.as_str() {
 	"-c" => todo!("compile"), // compile
-	"-f" => todo!("file mode"), // interprate file
 	_ => {
 	    for s in args.iter().skip(1) {
-		interpreter(s);
+		interpreter(&fs::read_to_string(s)
+			    .expect("Should have been able to read the file"));
 	    }
 	} // read string
     }
@@ -73,9 +73,9 @@ fn interpreter(tokens: &str) {
 	    },
 
 	    '[' if tape[tape_ptr] == 0 => {
+		let mut count: isize = 0;
 		loop {
-		    let Some((_, token)) = stream.next() else {panic!()};
-		    let mut count: usize = 0;
+		    let Some((_, token)) = stream.next() else { panic!() };
 
 		    match token {
 			'[' => count += 1,
