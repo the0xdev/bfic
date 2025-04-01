@@ -7,29 +7,37 @@ use std::io::{
     Write,
     stdout,
     stdin
-
 };
 
 use std::env;
 use std::fs;
 
-use std::fs::File;
-use std::io::prelude::*;
-use std::path::Path;
 
 const TAPE_LEN: usize = 30_000;
+
+macro_rules! interpreter {
+    ($t:expr) => {
+	interpreter($t, None, None, None)
+    };
+    ($t:expr, $m:expr, $s:expr, $p:expr) => {
+	interpreter($t, Some($m), Some($s.clone()), Some($p))
+    };
+}
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
     if args.len() == 1 {
+	let mut m: [u8; TAPE_LEN] = [0; TAPE_LEN];
+	let mut s: Vec<usize> = Vec::new();
+	let mut p: usize = 0;
 	loop {
-	    print!(">>> ");
+	    print!("[{} | {:#x}] ==> ", p, m[p] as u8);
 	    let _ = stdout().flush();
 	    let mut input = String::new();
 	    match stdin().read_line(&mut input) {
-		Ok(n) => {
-		    interpreter(&input);
+		Ok(..) => {
+		    (m, s, p) = interpreter!(&input, m, s, p);
 		}
 		Err(error) => println!("error: {error}"),
 	    }
@@ -42,22 +50,23 @@ fn main() {
 	"-c" => todo!("compile"), // compile
 	_ => {
 	    for s in args.iter().skip(1) {
-		interpreter(&fs::read_to_string(s)
+		let _ = interpreter!(&fs::read_to_string(s)
 			    .expect("Should have been able to read the file"));
 	    }
 	} // read string
     }
 }
 
-fn interpreter(tokens: &str) {
-    let mut tape: [u8; TAPE_LEN] = [0; TAPE_LEN];
-    let mut stack: Vec<usize> = Vec::new();
+fn interpreter(tokens: &str, mem: Option<[u8; TAPE_LEN]>, s: Option<Vec<usize>>, ptr: Option<usize>) -> ([u8; TAPE_LEN], Vec<usize>, usize) {
+    let mut tape: [u8; TAPE_LEN] = mem.unwrap_or([0; TAPE_LEN]);
+    let mut stack: Vec<usize> = s.unwrap_or(Vec::new());
 
-    let mut tape_ptr: usize = 0;
+    let mut tape_ptr: usize = ptr.unwrap_or(0);
     let mut stream = tokens.chars().enumerate();
 
     loop {
-	let Some((ii, token)) = stream.next() else { break; };
+	let Some((ii, token)) = stream.next() else { return (tape, stack, tape_ptr); };
+//	println!("({}, {}) | {}", ii, token, tape_ptr);
 	match token {
 	    '>' if tape_ptr == TAPE_LEN - 1 => tape_ptr = 0,
 	    '>' => tape_ptr += 1,
