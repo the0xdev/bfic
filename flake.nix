@@ -5,7 +5,7 @@
 {
   description = "Brainfuck interpreter and compilier";
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
   outputs = {
@@ -23,6 +23,7 @@
               name = "bfic";
               src = ./.;
 
+              RUST_BACKTRACE=1;
               buildInputs = [
               ];
               nativeBuildInputs = [
