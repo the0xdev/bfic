@@ -12,12 +12,11 @@ use std::io::{
 use std::env;
 use std::fs;
 
-
 const TAPE_LEN: usize = 30_000;
 
 macro_rules! interpreter {
     ($t:expr) => {
-	interpreter($t, None, None, None)
+	let _ = interpreter($t, None, None, None);
     };
     ($t:expr, $m:expr, $s:expr, $p:expr) => {
 	interpreter($t, Some($m), Some($s.clone()), Some($p))
@@ -50,8 +49,8 @@ fn main() {
 	"-c" => todo!("compile"), // compile
 	_ => {
 	    for s in args.iter().skip(1) {
-		let _ = interpreter!(&fs::read_to_string(s)
-			    .expect("Should have been able to read the file"));
+		interpreter!(&fs::read_to_string(s)
+			     .expect("Should have been able to read the file"));
 	    }
 	} // read string
     }
