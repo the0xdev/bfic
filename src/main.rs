@@ -95,7 +95,7 @@ fn interpreter(tokens: &str, tape: &mut [u8; TAPE_LEN], stack: &mut Vec<usize>, 
 	    '[' if tape[*tape_ptr] == 0 => {
 		let mut count: isize = 0;
 		loop {
-		    let Some((_, token)) = stream.next() else { panic!() };
+		    let Some((_, token)) = stream.next() else { panic!("unmatched square bracket.") };
 
 		    match token {
 			'[' => count += 1,
@@ -103,7 +103,7 @@ fn interpreter(tokens: &str, tape: &mut [u8; TAPE_LEN], stack: &mut Vec<usize>, 
 			    break;
 			},
 			']' if count < 0 => {
-			    panic!("");
+			    panic!("unmatched square bracket.");
 			},
 			']' => count -= 1,
 			_ => (),
@@ -114,7 +114,7 @@ fn interpreter(tokens: &str, tape: &mut [u8; TAPE_LEN], stack: &mut Vec<usize>, 
 		stack.push(ii - 1);
 	    },
 
-	    ']' if stack.is_empty() => panic!("No opening square bracket."),
+	    ']' if stack.is_empty() => panic!("unmatched square bracket."),
 	    ']' if tape[*tape_ptr] != 0 => {
 		stream = tokens.chars().enumerate();
 		let index = stack.pop().expect("No opening square bracket.");
