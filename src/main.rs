@@ -8,7 +8,6 @@ use std::io::{
     stdout,
     stdin,
     IsTerminal,
-
 };
 
 use std::env;
@@ -18,10 +17,14 @@ const TAPE_LEN: usize = 30_000;
 
 macro_rules! interpreter {
     ($t:expr) => {
-	let _ = interpreter($t, None, None, None);
+	interpreter($t,
+		    &mut [0; TAPE_LEN],
+		    &mut Vec::<usize>::new(),
+		    &mut 0
+	);
     };
     ($t:expr, $m:expr, $s:expr, $p:expr) => {
-	interpreter($t, Some($m), Some($s.clone()), Some($p))
+	interpreter($t, $m, $s, $p)
     };
 }
 
@@ -38,7 +41,7 @@ fn main() {
 	    let mut input = String::new();
 	    match stdin().read_line(&mut input) {
 		Ok(..) => {
-		    (m, s, p) = interpreter!(&input, m, s, p);
+		    interpreter!(&input, &mut m, &mut s, &mut p);
 		}
 		Err(error) => println!("error: {error}"),
 	    }
@@ -58,31 +61,27 @@ fn main() {
     }
 }
 
-fn interpreter(tokens: &str, mem: Option<[u8; TAPE_LEN]>, s: Option<Vec<usize>>, ptr: Option<usize>) -> ([u8; TAPE_LEN], Vec<usize>, usize) {
-    let mut tape: [u8; TAPE_LEN] = mem.unwrap_or([0; TAPE_LEN]);
-    let mut stack: Vec<usize> = s.unwrap_or_default();
-
-    let mut tape_ptr: usize = ptr.unwrap_or(0);
+fn interpreter(tokens: &str, tape: &mut [u8; TAPE_LEN], stack: &mut Vec<usize>, tape_ptr: &mut usize) {
     let mut stream = tokens.chars().enumerate();
 
     loop {
-	let Some((ii, token)) = stream.next() else { return (tape, stack, tape_ptr); };
-//	println!("({}, {}) | {}", ii, token, tape_ptr);
+	let Some((ii, token)) = stream.next() else { break; };
+
 	match token {
-	    '>' if tape_ptr == TAPE_LEN - 1 => tape_ptr = 0,
-	    '>' => tape_ptr += 1,
+	    '>' if *tape_ptr == TAPE_LEN - 1 => *tape_ptr = 0,
+	    '>' => *tape_ptr += 1,
 
-	    '<' if tape_ptr == 0 => tape_ptr = TAPE_LEN - 1,
-	    '<' => tape_ptr -= 1,
+	    '<' if *tape_ptr == 0 => *tape_ptr = TAPE_LEN - 1,
+	    '<' => *tape_ptr -= 1,
 
-	    '+' if tape[tape_ptr] == u8::MAX => tape[tape_ptr] = u8::MIN,
-	    '+' => tape[tape_ptr] += 1,
+	    '+' if tape[*tape_ptr] == u8::MAX => tape[*tape_ptr] = u8::MIN,
+	    '+' => tape[*tape_ptr] += 1,
 
-	    '-' if tape[tape_ptr] == u8::MIN => tape[tape_ptr] = u8::MAX,
-	    '-' => tape[tape_ptr] -= 1,
+	    '-' if tape[*tape_ptr] == u8::MIN => tape[*tape_ptr] = u8::MAX,
+	    '-' => tape[*tape_ptr] -= 1,
 
-	    '.' => print!("{}", char::from(tape[tape_ptr])),
-	    ',' => tape[tape_ptr] = {
+	    '.' => print!("{}", char::from(tape[*tape_ptr])),
+	    ',' => tape[*tape_ptr] = {
 		let input = stdin();
 		if !input.is_terminal() {
 		    print!("input: ");
@@ -94,7 +93,7 @@ fn interpreter(tokens: &str, mem: Option<[u8; TAPE_LEN]>, s: Option<Vec<usize>>,
 		byte.unwrap()
 	    },
 
-	    '[' if tape[tape_ptr] == 0 => {
+	    '[' if tape[*tape_ptr] == 0 => {
 		let mut count: isize = 0;
 		loop {
 		    let Some((_, token)) = stream.next() else { panic!() };
@@ -117,7 +116,7 @@ fn interpreter(tokens: &str, mem: Option<[u8; TAPE_LEN]>, s: Option<Vec<usize>>,
 	    },
 
 	    ']' if stack.is_empty() => panic!("No opening square bracket."),
-	    ']' if tape[tape_ptr] != 0 => {
+	    ']' if tape[*tape_ptr] != 0 => {
 		stream = tokens.chars().enumerate();
 		let index = stack.pop().expect("No opening square bracket.");
 		let _ = stream.position(|(n, _)| n == index);
