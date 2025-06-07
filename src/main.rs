@@ -35,6 +35,7 @@ fn main() {
 	let mut m: [u8; TAPE_LEN] = [0; TAPE_LEN];
 	let mut s: Vec<usize> = Vec::new();
 	let mut p: usize = 0;
+	println!("Welcome to bfic.\nUse C-c to quit.\n{}", "-".repeat(80));
 	loop {
 	    print!("[{} | 0x{:X}] ==> ", p, m[p]);
 	    let _ = stdout().flush();
