@@ -89,7 +89,6 @@ fn interpreter(tokens: &str, tape: &mut [u8; TAPE_LEN], stack: &mut Vec<usize>, 
 		}
 		let byte: Option<u8> = input.bytes().next().and_then(|result| result.ok());
 
-		println!();
 		byte.unwrap()
 	    },
 
