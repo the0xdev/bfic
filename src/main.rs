@@ -6,7 +6,9 @@ use std::io::{
     Read,
     Write,
     stdout,
-    stdin
+    stdin,
+    IsTerminal,
+
 };
 
 use std::env;
@@ -31,7 +33,7 @@ fn main() {
 	let mut s: Vec<usize> = Vec::new();
 	let mut p: usize = 0;
 	loop {
-	    print!("[{} | {:#x}] ==> ", p, m[p] as u8);
+	    print!("[{} | 0x{:X}] ==> ", p, m[p]);
 	    let _ = stdout().flush();
 	    let mut input = String::new();
 	    match stdin().read_line(&mut input) {
@@ -58,7 +60,7 @@ fn main() {
 
 fn interpreter(tokens: &str, mem: Option<[u8; TAPE_LEN]>, s: Option<Vec<usize>>, ptr: Option<usize>) -> ([u8; TAPE_LEN], Vec<usize>, usize) {
     let mut tape: [u8; TAPE_LEN] = mem.unwrap_or([0; TAPE_LEN]);
-    let mut stack: Vec<usize> = s.unwrap_or(Vec::new());
+    let mut stack: Vec<usize> = s.unwrap_or_default();
 
     let mut tape_ptr: usize = ptr.unwrap_or(0);
     let mut stream = tokens.chars().enumerate();
@@ -81,15 +83,15 @@ fn interpreter(tokens: &str, mem: Option<[u8; TAPE_LEN]>, s: Option<Vec<usize>>,
 
 	    '.' => print!("{}", char::from(tape[tape_ptr])),
 	    ',' => tape[tape_ptr] = {
-		print!("input: ");
-		let _ = stdout().flush();
-		let input: Option<u8> = std::io::stdin()
-		    .bytes() 
-		    .next()
-		    .and_then(|result| result.ok())
-		    .map(|byte| byte as u8);
-		print!("\n");
-		input.unwrap()
+		let input = stdin();
+		if !input.is_terminal() {
+		    print!("input: ");
+		    let _ = stdout().flush();
+		}
+		let byte: Option<u8> = input.bytes().next().and_then(|result| result.ok());
+
+		println!();
+		byte.unwrap()
 	    },
 
 	    '[' if tape[tape_ptr] == 0 => {
